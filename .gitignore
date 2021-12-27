@@ -1,0 +1,14 @@
+*.pkl
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.jpg
+*.mp4
+*.avi
+.vscode
+*.py[cod]
+*.log
+*__pycache__*
+*ckpt*
+*.ts
