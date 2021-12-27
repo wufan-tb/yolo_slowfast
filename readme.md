@@ -12,11 +12,11 @@
 
 #### Demo comparison betwween original(<-left) and ours(->right).
 
-<img src="./demo/ava_slowfast.gif" style="zoom: 85%;" /><img src="./demo/yolov5+slowfast.gif" style="zoom:91%;" />
+<img src="./demo/ava_slowfast.gif" style="zoom: 50%;" /><img src="./demo/yolov5+slowfast.gif" style="zoom:60%;" />
 
 ## Installation
 
-1. create a new python environment:
+1. create a new python environment (*optional*):
 
    ```
    conda create -n env_name python=3.7.11
@@ -40,7 +40,7 @@
    python yolo_slowfast.py --input {path to your video}
    ```
 
-   The first time to execute this command may take some times to download the yolov5 code and it's weights file from torch.hub, keep your network connected.
+   The first time execute this command may take some times to download the yolov5 code and it's weights file from torch.hub, keep your network connection.
 
 ## References
 
