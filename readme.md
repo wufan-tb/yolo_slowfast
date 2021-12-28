@@ -4,9 +4,9 @@
 
 #### Here are some details about our modification:
 
-- we choose yolov5 as an object detector instead of detectron2, it is faster and more convenient
+- we choose yolov5 as an object detector instead of Faster R-CNN, it is faster and more convenient
 - we use a tracker(deepsort) to allocate action labels to all objects(with same ids) in different frames
-- our processing speed reached 24.2 FPS at 30 inference barch size (on a single RTX 2080Ti GPU)
+- our processing speed reached 24.2 FPS at 30 inference batch size (on a single RTX 2080Ti GPU)
 
 > Relevant infomation: [FAIR/PytorchVideo](https://github.com/facebookresearch/pytorchvideo); [Ultralytics/Yolov5](https://github.com/ultralytics/yolov5)
 
@@ -52,9 +52,9 @@ Thanks for these great works:
 
 [3] [FAIR/PytorchVideo](https://github.com/facebookresearch/pytorchvideo)
 
-[2] AVA: A Video Dataset of Spatio-temporally Localized Atomic Visual Actions. [paper](https://arxiv.org/pdf/1705.08421.pdf)
+[4] AVA: A Video Dataset of Spatio-temporally Localized Atomic Visual Actions. [paper](https://arxiv.org/pdf/1705.08421.pdf)
 
-[3] SlowFast Networks for Video Recognition. [paper](https://arxiv.org/pdf/1812.03982.pdf)
+[5] SlowFast Networks for Video Recognition. [paper](https://arxiv.org/pdf/1812.03982.pdf)
 
 ## Citation
 
