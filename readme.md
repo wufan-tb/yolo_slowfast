@@ -19,7 +19,7 @@
 1. create a new python environment (optional):
 
    ```
-   conda create -n env_name python=3.7.11
+   conda create -n {your_env_name} python=3.7.11
    ```
 
 2. install requiments:

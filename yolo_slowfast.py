@@ -178,7 +178,7 @@ if __name__=="__main__":
     parser.add_argument('--device', default='cuda', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--classes', nargs='+', type=int, help='filter by class: --class 0, or --class 0 2 3')
     # slowfast config
-    parser.add_argument('--process_batch_size', type=int, default=25, help='object confidence threshold')
+    parser.add_argument('--process_batch_size', type=int, default=25, help='10 ~ 30 should be fine, the bigger, the faster')
     parser.add_argument('--video_clip_length', type=float, default=1.2, help='# set 0.8 or 1 or 1.2')
     parser.add_argument('--frames_per_second', type=int, default=25, help='usually set 25 or 30')
     config = parser.parse_args()
