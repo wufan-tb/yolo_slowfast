@@ -12,7 +12,7 @@
 
 #### Demo comparison betwween original(<-left) and ours(->right).
 
-<img src="./demo/ava_slowfast.gif" width="500" /><img src="./demo/yolov5+slowfast.gif" width="500" />
+<img src="./demo/ava_slowfast.gif" width="400" /><img src="./demo/yolov5+slowfast.gif" width="400" />
 
 ## Installation
 
