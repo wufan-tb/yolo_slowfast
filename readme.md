@@ -12,11 +12,11 @@
 
 #### Demo comparison betwween original(<-left) and ours(->right).
 
-<img src="./demo/ava_slowfast.gif" style="zoom: 50%;" /><img src="./demo/yolov5+slowfast.gif" style="zoom:60%;" />
+<img src="./demo/ava_slowfast.gif" width="500" /><img src="./demo/yolov5+slowfast.gif" width="500" />
 
 ## Installation
 
-1. create a new python environment (*optional*):
+1. create a new python environment (optional):
 
    ```
    conda create -n env_name python=3.7.11
