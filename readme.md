@@ -10,7 +10,7 @@
 
 > Relevant infomation: [FAIR/PytorchVideo](https://github.com/facebookresearch/pytorchvideo); [Ultralytics/Yolov5](https://github.com/ultralytics/yolov5)
 
-#### Demo comparison betwween original(<-left) and ours(->right).
+#### Demo comparison between original(<-left) and ours(->right).
 
 <img src="./demo/ava_slowfast.gif" width="400" /><img src="./demo/yolov5+slowfast.gif" width="400" />
 
@@ -65,7 +65,7 @@ If you find our work useful, please cite as follow:
     author = {Wu Fan},
     title = { A realtime action detection frame work based on PytorchVideo},
     year = {2021},
-    url = {\url{https://github.com/wufan-tb/gmm_dae}}
+    url = {\url{https://github.com/wufan-tb/yolo_slowfast}}
 }
 ```
 
