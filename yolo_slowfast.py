@@ -1,5 +1,5 @@
 import numpy as np
-import os,cv2,time,torch,natsort,random,pytorchvideo,subprocess,warnings,argparse
+import os,cv2,time,torch,natsort,random,pytorchvideo,subprocess,warnings,argparse,math
 warnings.filterwarnings("ignore",category=UserWarning)
 
 from pytorchvideo.transforms.functional import (
@@ -11,6 +11,10 @@ from pytorchvideo.data.ava import AvaLabeledVideoFramePaths
 from pytorchvideo.models.hub import slowfast_r50_detection
 from deep_sort.deep_sort import DeepSort
 
+
+def tensor_to_numpy(tensor):
+    img = tensor.cpu().numpy().transpose((1, 2, 0))
+    return img
 
 def ava_inference_transform(clip, boxes,
     num_frames = 32, #if using slowfast_r50_detection, change this to 32, 4 for slow 
@@ -69,17 +73,6 @@ def visualize_yolopreds(yolo_preds,id_to_ava_labels,color_map,save_folder):
                 color = color_map[int(cls)]
                 im = plot_one_box(box,im,color,text)
         cv2.imwrite(os.path.join(save_folder,yolo_preds.files[i]),im)
-        
-def extract_video(video_path,img_folder):
-    cap = cv2.VideoCapture(video_path)
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if ret:
-            index = int(cap.get(1))
-            cv2.imwrite(os.path.join(img_folder,f'{index}.jpg'),frame)
-        else:
-            break
-    cap.release()
     
 def clean_folder(folder_name):
     sys_cmd = "rm -rf {}".format(folder_name)
@@ -100,44 +93,36 @@ def main(config):
     ava_labelnames,_ = AvaLabeledVideoFramePaths.read_label_map("selfutils/temp.pbtxt")
     coco_color_map = [[random.randint(0, 255) for _ in range(3)] for _ in range(80)]
 
-    video_path = config.input
-    video = pytorchvideo.data.encoded_video.EncodedVideo.from_path(video_path)
-
-    img_path="temp1"
-    clean_folder(img_path)
-    os.makedirs(img_path,exist_ok=True)
-    print("extracting video...")
-    extract_video(video_path,img_path)
-    imgnames=natsort.natsorted(os.listdir(img_path))
-
-    save_path="temp2"
+    save_path="temp"
     clean_folder(save_path)
     os.makedirs(save_path,exist_ok=True)
-
-    process_batch_size = config.process_batch_size    # 10 ~ 30 should be fine, the bigger, the faster
-    video_clip_length = config.video_clip_length   # set 0.8 or 1 or 1.2
-    frames_per_second = config.frames_per_second     # usually set 25 or 30
     print("processing...")
+    
+    video = pytorchvideo.data.encoded_video.EncodedVideo.from_path(config.input)
     a=time.time()
-    for i in range(0,len(imgnames),process_batch_size):
-        imgs=[os.path.join(img_path,name) for name in imgnames[i:i+process_batch_size]]
-        yolo_preds=model(imgs, size=imsize)
-        mid=(i+process_batch_size/2)/frames_per_second
-        video_clips=video.get_clip(mid - video_clip_length/2, mid + video_clip_length/2 - 0.04)
+    for i in range(0,math.ceil(video.duration),1):
+        video_clips=video.get_clip(i, i+1-0.04)
         video_clips=video_clips['video']
         if video_clips is None:
             continue
-        print(i/frames_per_second,video_clips.shape,len(imgs))
+        img_num=video_clips.shape[1]
+        imgs=[]
+        for j in range(img_num):
+            imgs.append(tensor_to_numpy(video_clips[:,j,:,:]))
+        yolo_preds=model(imgs, size=imsize)
+        yolo_preds.files=[f"img_{i*25+k}.jpg" for k in range(img_num)]
+
+        print(i,video_clips.shape,img_num)
         deepsort_outputs=[]
-        for i in range(len(yolo_preds.pred)):
-            temp=deepsort_update(deepsort_tracker,yolo_preds.pred[i].cpu(),yolo_preds.xywh[i][:,0:4].cpu(),yolo_preds.imgs[i])
+        for j in range(len(yolo_preds.pred)):
+            temp=deepsort_update(deepsort_tracker,yolo_preds.pred[j].cpu(),yolo_preds.xywh[j][:,0:4].cpu(),yolo_preds.imgs[j])
             if len(temp)==0:
                 temp=np.ones((0,8))
             deepsort_outputs.append(temp.astype(np.float32))
         yolo_preds.pred=deepsort_outputs
         id_to_ava_labels={}
-        if yolo_preds.pred[len(imgs)//2].shape[0]:
-            inputs,inp_boxes,_=ava_inference_transform(video_clips,yolo_preds.pred[len(imgs)//2][:,0:4],crop_size=imsize)
+        if yolo_preds.pred[img_num//2].shape[0]:
+            inputs,inp_boxes,_=ava_inference_transform(video_clips,yolo_preds.pred[img_num//2][:,0:4],crop_size=imsize)
             inp_boxes = torch.cat([torch.zeros(inp_boxes.shape[0],1), inp_boxes], dim=1)
             if isinstance(inputs, list):
                 inputs = [inp.unsqueeze(0).to(device) for inp in inputs]
@@ -146,10 +131,10 @@ def main(config):
             with torch.no_grad():
                 slowfaster_preds = video_model(inputs, inp_boxes.to(device))
                 slowfaster_preds = slowfaster_preds.cpu()
-            for tid,avalabel in zip(yolo_preds.pred[len(imgs)//2][:,5].tolist(),np.argmax(slowfaster_preds,axis=1).tolist()):
+            for tid,avalabel in zip(yolo_preds.pred[img_num//2][:,5].tolist(),np.argmax(slowfaster_preds,axis=1).tolist()):
                 id_to_ava_labels[tid]=ava_labelnames[avalabel+1]
         visualize_yolopreds(yolo_preds,id_to_ava_labels,coco_color_map,save_path)
-    print("total cost: {:.3f}s, video clips length: {}s".format(time.time()-a,len(imgnames)/frames_per_second))
+    print("total cost: {:.3f}s, video clips length: {}s".format(time.time()-a,video.duration))
         
     vide_save_path = config.output
     img_list=natsort.natsorted(os.listdir(save_path))
@@ -162,7 +147,6 @@ def main(config):
         video.write(img)
     video.release()
 
-    clean_folder(img_path)
     clean_folder(save_path)
     print('saved video to:', vide_save_path)
     
@@ -171,16 +155,12 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=str, default="/home/wufan/images/video/vad.mp4", help='test imgs folder or video or camera')
     parser.add_argument('--output', type=str, default="output.mp4", help='folder to save result imgs, can not use input folder')
-    # yolo config
+    # object detect config
     parser.add_argument('--imsize', type=int, default=640, help='inference size (pixels)')
     parser.add_argument('--conf', type=float, default=0.4, help='object confidence threshold')
     parser.add_argument('--iou', type=float, default=0.4, help='IOU threshold for NMS')
     parser.add_argument('--device', default='cuda', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--classes', nargs='+', type=int, help='filter by class: --class 0, or --class 0 2 3')
-    # slowfast config
-    parser.add_argument('--process_batch_size', type=int, default=25, help='10 ~ 30 should be fine, the bigger, the faster')
-    parser.add_argument('--video_clip_length', type=float, default=1.2, help='# set 0.8 or 1 or 1.2')
-    parser.add_argument('--frames_per_second', type=int, default=25, help='usually set 25 or 30')
     config = parser.parse_args()
     
     print(config)
