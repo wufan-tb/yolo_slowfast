@@ -58,7 +58,7 @@ def deepsort_update(Tracker,pred,xywh,np_img):
     outputs = Tracker.update(xywh, pred[:,4:5],pred[:,5].tolist(),cv2.cvtColor(np_img,cv2.COLOR_BGR2RGB))
     return outputs
 
-def visualize_yolopreds(yolo_preds,id_to_ava_labels,color_map,save_folder):
+def save_yolopreds_tovideo(yolo_preds,id_to_ava_labels,color_map,output_video):
     for i, (im, pred) in enumerate(zip(yolo_preds.imgs, yolo_preds.pred)):
         im=cv2.cvtColor(im,cv2.COLOR_BGR2RGB)
         if pred.shape[0]:
@@ -72,12 +72,7 @@ def visualize_yolopreds(yolo_preds,id_to_ava_labels,color_map,save_folder):
                 text = '{} {} {}'.format(int(trackid),yolo_preds.names[int(cls)],ava_label)
                 color = color_map[int(cls)]
                 im = plot_one_box(box,im,color,text)
-        cv2.imwrite(os.path.join(save_folder,yolo_preds.files[i]),im)
-    
-def clean_folder(folder_name):
-    sys_cmd = "rm -rf {}".format(folder_name)
-    child = subprocess.Popen(sys_cmd,shell=True)
-    child.wait()
+        output_video.write(im.astype(np.uint8))
 
 def main(config):
     model = torch.hub.load('ultralytics/yolov5', 'yolov5l6')
@@ -93,9 +88,11 @@ def main(config):
     ava_labelnames,_ = AvaLabeledVideoFramePaths.read_label_map("selfutils/temp.pbtxt")
     coco_color_map = [[random.randint(0, 255) for _ in range(3)] for _ in range(80)]
 
-    save_path="temp"
-    clean_folder(save_path)
-    os.makedirs(save_path,exist_ok=True)
+    vide_save_path = config.output
+    video=cv2.VideoCapture(config.input)
+    width,height = int(video.get(3)),int(video.get(4))
+    video.release()
+    outputvideo = cv2.VideoWriter(vide_save_path,cv2.VideoWriter_fourcc(*'mp4v'), 25, (width,height))
     print("processing...")
     
     video = pytorchvideo.data.encoded_video.EncodedVideo.from_path(config.input)
@@ -133,21 +130,10 @@ def main(config):
                 slowfaster_preds = slowfaster_preds.cpu()
             for tid,avalabel in zip(yolo_preds.pred[img_num//2][:,5].tolist(),np.argmax(slowfaster_preds,axis=1).tolist()):
                 id_to_ava_labels[tid]=ava_labelnames[avalabel+1]
-        visualize_yolopreds(yolo_preds,id_to_ava_labels,coco_color_map,save_path)
+        save_yolopreds_tovideo(yolo_preds,id_to_ava_labels,coco_color_map,outputvideo)
     print("total cost: {:.3f}s, video clips length: {}s".format(time.time()-a,video.duration))
         
-    vide_save_path = config.output
-    img_list=natsort.natsorted(os.listdir(save_path))
-    im=cv2.imread(os.path.join(save_path,img_list[0]))
-    height, width = im.shape[0], im.shape[1]
-    video = cv2.VideoWriter(vide_save_path,cv2.VideoWriter_fourcc(*'mp4v'), 25, (width,height))
-
-    for im_name in img_list:
-        img = cv2.imread(os.path.join(save_path,im_name))
-        video.write(img)
-    video.release()
-
-    clean_folder(save_path)
+    outputvideo.release()
     print('saved video to:', vide_save_path)
     
     
