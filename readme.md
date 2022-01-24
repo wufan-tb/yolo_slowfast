@@ -14,6 +14,10 @@
 
 <img src="./demo/ava_slowfast.gif" width="400" /><img src="./demo/yolov5+slowfast.gif" width="400" />
 
+#### Update Log:
+
+- 2022.01.24  optimize pre-process method(no need to extract video to image before processing), faster and cleaner.
+
 ## Installation
 
 1. create a new python environment (optional):
