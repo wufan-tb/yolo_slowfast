@@ -1,5 +1,5 @@
 import numpy as np
-import os,cv2,time,torch,natsort,random,pytorchvideo,subprocess,warnings,argparse,math
+import os,cv2,time,torch,random,pytorchvideo,warnings,argparse,math
 warnings.filterwarnings("ignore",category=UserWarning)
 
 from pytorchvideo.transforms.functional import (
