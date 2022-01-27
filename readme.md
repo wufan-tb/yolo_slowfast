@@ -32,13 +32,20 @@
    pip install -r requirements.txt
    ```
 
-3. download weights file(ckpt.t7) from [[deepsort]](https://drive.google.com/drive/folders/1xhG0kRH1EX5B9_Iz8gQJb7UNnn_riXi6) to this folder:
+3. clone this repo:
+
+   ```
+   git clone https://github.com/wufan-tb/yolo_slowfast
+   cd yolo_slowfast
+   ```
+
+4. download weights file(ckpt.t7) from [[deepsort]](https://drive.google.com/drive/folders/1xhG0kRH1EX5B9_Iz8gQJb7UNnn_riXi6) to this folder:
 
    ```
    ./deep_sort/deep_sort/deep/checkpoint/
    ```
 
-4. test on your video:
+5. test on your video:
 
    ```
    python yolo_slowfast.py --input {path to your video}
