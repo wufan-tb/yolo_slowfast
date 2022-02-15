@@ -20,26 +20,26 @@
 
 ## Installation
 
-1. create a new python environment (optional):
-
-   ```
-   conda create -n {your_env_name} python=3.7.11
-   conda activate {your_env_name}
-   ```
-
-2. install requiments:
-
-   ```
-   pip install -r requirements.txt
-   ```
-
-3. clone this repo:
+1. clone this repo:
 
    ```
    git clone https://github.com/wufan-tb/yolo_slowfast
    cd yolo_slowfast
    ```
 
+2. create a new python environment (optional):
+
+   ```
+   conda create -n {your_env_name} python=3.7.11
+   conda activate {your_env_name}
+   ```
+
+3. install requiments:
+
+   ```
+   pip install -r requirements.txt
+   ```
+   
 4. download weights file(ckpt.t7) from [[deepsort]](https://drive.google.com/drive/folders/1xhG0kRH1EX5B9_Iz8gQJb7UNnn_riXi6) to this folder:
 
    ```
