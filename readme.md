@@ -83,8 +83,6 @@ If you find our work useful, please cite as follow:
 
 ### Stargazers over time
 
-```markdown
 [![Stargazers over time](https://starchart.cc/wufan-tb/yolo_slowfast.svg)](https://starchart.cc/wufan-tb/yolo_slowfast)
-```
 
 
