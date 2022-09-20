@@ -59,7 +59,7 @@ def deepsort_update(Tracker,pred,xywh,np_img):
     return outputs
 
 def save_yolopreds_tovideo(yolo_preds,id_to_ava_labels,color_map,output_video):
-    for i, (im, pred) in enumerate(zip(yolo_preds.imgs, yolo_preds.pred)):
+    for i, (im, pred) in enumerate(zip(yolo_preds.ims, yolo_preds.pred)):
         im=cv2.cvtColor(im,cv2.COLOR_BGR2RGB)
         if pred.shape[0]:
             for j, (*box, cls, trackid, vx, vy) in enumerate(pred):
@@ -112,7 +112,7 @@ def main(config):
         print(i,video_clips.shape,img_num)
         deepsort_outputs=[]
         for j in range(len(yolo_preds.pred)):
-            temp=deepsort_update(deepsort_tracker,yolo_preds.pred[j].cpu(),yolo_preds.xywh[j][:,0:4].cpu(),yolo_preds.imgs[j])
+            temp=deepsort_update(deepsort_tracker,yolo_preds.pred[j].cpu(),yolo_preds.xywh[j][:,0:4].cpu(),yolo_preds.ims[j])
             if len(temp)==0:
                 temp=np.ones((0,8))
             deepsort_outputs.append(temp.astype(np.float32))
