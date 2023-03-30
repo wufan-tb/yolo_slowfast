@@ -55,7 +55,7 @@ class DeepSort(object):
             label=track.label
             Vx=10*track.mean[4]
             Vy=10*track.mean[5]
-            outputs.append(np.array([x1,y1,x2,y2,label,track_id,Vx,Vy], dtype=np.int))
+            outputs.append(np.array([x1,y1,x2,y2,label,track_id,Vx,Vy], dtype=np.int32))
         if len(outputs) > 0:
             outputs = np.stack(outputs,axis=0)
         return outputs
