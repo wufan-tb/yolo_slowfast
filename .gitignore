@@ -12,3 +12,5 @@
 *__pycache__*
 *ckpt*
 *.ts
+*.webm
+*.ipynb_checkpoints*
