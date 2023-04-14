@@ -95,7 +95,6 @@ def deepsort_update(Tracker, pred, xywh, np_img):
 
 def save_yolopreds_tovideo(yolo_preds, id_to_ava_labels, color_map, output_video, vis=False):
     for i, (im, pred) in enumerate(zip(yolo_preds.ims, yolo_preds.pred)):
-        im=cv2.cvtColor(im,cv2.COLOR_BGR2RGB)
         if pred.shape[0]:
             for j, (*box, cls, trackid, vx, vy) in enumerate(pred):
                 if int(cls) != 0:
